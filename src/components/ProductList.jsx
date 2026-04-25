@@ -51,9 +51,6 @@ const ProductList = () => {
     };
   }, []);
 
-  if (loading) return <div className="section-padding text-center">Loading Products...</div>;
-  if (error) return <div className="section-padding text-center" style={{color: 'red'}}>Error: {error}</div>;
-
   // Filter products by search query
   const filteredProducts = products.filter(p => {
     if (!searchQuery) return true;
@@ -71,6 +68,10 @@ const ProductList = () => {
   }, [searchQuery, filteredProducts.length, loading]);
 
   const departments = [...new Set(filteredProducts.map(p => p.department || p.category || 'General'))];
+
+  if (loading) return <div className="section-padding text-center">Loading Products...</div>;
+  if (error) return <div className="section-padding text-center" style={{color: 'red'}}>Error: {error}</div>;
+
 
   return (
     <section id="products" className="products section-padding">
@@ -103,7 +104,10 @@ const ProductList = () => {
                     
                     {/* Dynamic Rating Stars */}
                     <div style={{display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.5rem', color: '#fbbf24'}}>
-                      <span>{'★'.repeat(Math.round(product.rating || 0)) + '☆'.repeat(5 - Math.round(product.rating || 0))}</span>
+                      <span>
+                        {'★'.repeat(Math.max(0, Math.min(5, Math.round(Number(product.rating) || 0)))) + 
+                         '☆'.repeat(Math.max(0, 5 - Math.min(5, Math.round(Number(product.rating) || 0))))}
+                      </span>
                       <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>({product.numReviews || 0})</span>
                     </div>
 
