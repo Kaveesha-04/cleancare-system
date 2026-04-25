@@ -14,7 +14,7 @@ const Hero = () => {
             CleanCare delivers unparalleled commercial-grade cleaning supplies direct to your door. Whether you're stocking a massive enterprise facility or securing high-end products for your home, we have you covered.
           </p>
           <div className="hero-cta">
-            <a href="#products" className="btn btn-primary btn-large">Shop Full Catalog</a>
+            <a href="/#products" className="btn btn-primary btn-large">Shop Full Catalog</a>
           </div>
 
           <div className="hero-trust">

@@ -47,7 +47,6 @@ const Navbar = () => {
 
           <div className="nav-links">
             <a href="/" className="nav-link">Home</a>
-            <a href="#products" className="nav-link">Shop All</a>
             
             {user ? (
               <div className="nav-user-dropdown-container">

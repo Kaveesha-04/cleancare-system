@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { CurrencyContext } from '../context/CurrencyContext';
 import { AuthContext } from '../context/AuthContext';
 import ProductModal from './ProductModal';
@@ -12,8 +13,9 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Extract search query from URL
-  const queryParams = new URLSearchParams(window.location.search);
+  // Extract search query dynamically using React Router
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('search') || '';
   
   // Modal state
@@ -61,6 +63,13 @@ const ProductList = () => {
     return p.name.toLowerCase().includes(term) || deptMatch || catMatch;
   });
 
+  // Automatically open product modal if exactly 1 structural match is found
+  useEffect(() => {
+    if (searchQuery && filteredProducts.length === 1 && !loading) {
+      setSelectedProduct(filteredProducts[0]);
+    }
+  }, [searchQuery, filteredProducts.length, loading]);
+
   const departments = [...new Set(filteredProducts.map(p => p.department || p.category || 'General'))];
 
   return (
@@ -92,10 +101,10 @@ const ProductList = () => {
                     <h3 className="product-title">{product.name}</h3>
                     {product.section && <small style={{display: 'block', color: '#64748b', marginBottom: '0.5rem'}}>{product.section}</small>}
                     
-                    {/* Mock Amazon Rating Stars */}
+                    {/* Dynamic Rating Stars */}
                     <div style={{display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.5rem', color: '#fbbf24'}}>
-                      <span>★★★★★</span>
-                      <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>(128)</span>
+                      <span>{'★'.repeat(Math.round(product.rating || 0)) + '☆'.repeat(5 - Math.round(product.rating || 0))}</span>
+                      <span style={{fontSize: '0.8rem', color: 'var(--color-text-muted)'}}>({product.numReviews || 0})</span>
                     </div>
 
                     <p className="product-desc">{product.description}</p>

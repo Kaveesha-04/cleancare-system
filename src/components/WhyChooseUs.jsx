@@ -26,8 +26,6 @@ const WhyChooseUs = () => {
                 <span>Our catalog is rigorously tested and trusted by commercial janitorial services worldwide.</span>
               </li>
             </ul>
-
-            <a href="#contact" className="btn btn-primary mt-2">Speak to an Expert</a>
           </div>
           <div className="wcu-image">
             <div className="wcu-image-inner">

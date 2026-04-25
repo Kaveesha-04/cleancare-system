@@ -10,7 +10,9 @@ const productSchema = new mongoose.Schema({
   barcode: { type: String, unique: true, sparse: true },
   image: { type: String },
   retailDiscount: { type: Number, default: 0 },
-  wholesaleDiscount: { type: Number, default: 0 }
+  wholesaleDiscount: { type: Number, default: 0 },
+  rating: { type: Number, default: 0 },
+  numReviews: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

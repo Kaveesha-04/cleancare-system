@@ -133,7 +133,13 @@ const CartSidebar = () => {
               </div>
               <button 
                 className="btn btn-primary checkout-btn" 
-                onClick={() => setShowCheckout(true)}
+                onClick={() => {
+                  if (!user) {
+                    window.location.href = '/login';
+                  } else {
+                    setShowCheckout(true);
+                  }
+                }}
               >
                 Proceed to Checkout
               </button>

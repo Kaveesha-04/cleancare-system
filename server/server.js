@@ -232,6 +232,30 @@ app.get('/api/departments', async (req, res) => {
   }
 });
 
+// -- PUBLIC PRODUCT RATINGS --
+app.post('/api/products/:id/rate', async (req, res) => {
+  try {
+    const { rating } = req.body;
+    if (rating < 1 || rating > 5) return res.status(400).json({ error: 'Invalid rating. Must be 1-5.' });
+    
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    
+    // Mathematical recalculation of global rating
+    const totalCurrentRating = (product.rating || 0) * (product.numReviews || 0);
+    const newNumReviews = (product.numReviews || 0) + 1;
+    product.rating = (totalCurrentRating + rating) / newNumReviews;
+    product.numReviews = newNumReviews;
+    
+    await product.save();
+    
+    // Broadcast ping theoretically, but just return success
+    res.json({ ...product.toObject(), id: product._id });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error saving rating' });
+  }
+});
+
 // -- PROTECTED POS & ADMIN ROUTES --
 
 app.post('/api/products', authMiddleware, requireAdmin, async (req, res) => {
