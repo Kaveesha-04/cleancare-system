@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
 import './CategorySidebar.css';
 
 const CategorySidebar = () => {
+  const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
   const [expandedDepts, setExpandedDepts] = useState({});
 
@@ -29,7 +31,15 @@ const CategorySidebar = () => {
             return (
             <li key={idx} className="category-item">
               <div className="category-name" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                 <a href={`/?search=${encodeURIComponent(dept.name)}#products`} style={{color: 'inherit', textDecoration: 'none', flexGrow: 1}}>{dept.name}</a>
+                 <span 
+                   onClick={() => {
+                     navigate(`/?search=${encodeURIComponent(dept.name)}`);
+                     setTimeout(() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                   }}
+                   style={{color: 'inherit', flexGrow: 1, cursor: 'pointer', fontWeight: 'bold'}}
+                 >
+                   {dept.name}
+                 </span>
                  <span onClick={() => toggleDept(dept.name)} className="category-toggle-icon" style={{cursor: 'pointer', padding: '0 0.5rem', fontSize: '0.85rem', color: '#64748b'}}>
                    {isExpanded ? '▲' : '▼'}
                  </span>
@@ -38,7 +48,15 @@ const CategorySidebar = () => {
                 <ul className="subcategory-list">
                   {dept.sections.map((sub, i) => (
                     <li key={i}>
-                      <a href={`/?search=${encodeURIComponent(sub)}#products`}>{sub}</a>
+                      <span 
+                        onClick={() => {
+                          navigate(`/?search=${encodeURIComponent(sub)}`);
+                          setTimeout(() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                        }}
+                        style={{cursor: 'pointer', display: 'block', padding: '0.5rem 1.5rem 0.5rem 2.5rem', color: 'var(--color-text-muted)', fontSize: '0.95rem'}}
+                      >
+                        {sub}
+                      </span>
                     </li>
                   ))}
                 </ul>

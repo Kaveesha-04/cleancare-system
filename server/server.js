@@ -260,12 +260,19 @@ app.post('/api/products/:id/rate', async (req, res) => {
 // -- POST-DELIVERY FEEDBACK ENDPOINT --
 app.post('/api/feedback', async (req, res) => {
   try {
-    const { userId, rating, deliverySpeed, quality, comments } = req.body;
-    if (!rating || !deliverySpeed || !quality) {
+    const { userId, overallRating, deliverySpeed, quality, itemRatings, comments } = req.body;
+    if (!overallRating || !deliverySpeed || !quality) {
       return res.status(400).json({ error: 'Please provide all required star ratings.' });
     }
     
-    const f = new Feedback({ userId, rating, deliverySpeed, quality, comments });
+    const f = new Feedback({ 
+      userId, 
+      overallRating, 
+      deliverySpeed, 
+      quality, 
+      itemRatings: itemRatings || [],
+      comments 
+    });
     await f.save();
     
     res.status(201).json({ message: 'Feedback submitted successfully' });
@@ -494,6 +501,40 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
     res.json(safeUser);
   } catch (error) {
     res.status(500).json({error: 'Failed to authenticate user parameters'});
+  }
+});
+
+app.put('/api/auth/profile', authMiddleware, [
+  body('name').notEmpty().withMessage('Name required'),
+  body('phone').optional().isString()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
+
+  try {
+    const { name, phone } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.name = name;
+    if (phone !== undefined) user.phone = phone;
+
+    await user.save();
+    
+    const safeUser = user.toObject();
+    delete safeUser.passwordHash;
+    res.json({ message: 'Profile updated', user: safeUser });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+app.get('/api/orders/my-orders', authMiddleware, async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch order history' });
   }
 });
 

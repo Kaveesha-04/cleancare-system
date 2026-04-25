@@ -3,12 +3,16 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { CurrencyContext } from '../context/CurrencyContext';
 import FeedbackModal from './FeedbackModal';
+import AccountModal from './AccountModal';
+import OrdersModal from './OrdersModal';
 import './Navbar.css';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showOrdersModal, setShowOrdersModal] = useState(false);
   const { cartItemCount, toggleCart } = useContext(CartContext);
   const { user, logout } = useContext(AuthContext);
 
@@ -59,9 +63,9 @@ const Navbar = () => {
                   {user.role !== 'admin' && (
                     <div className="dropdown-points">⭐ {user.loyaltyPoints} Reward Points</div>
                   )}
-                  <a href="#account" className="dropdown-item">My Account</a>
-                  <a href="#orders" className="dropdown-item">Order History</a>
-                  <button onClick={() => setShowFeedback(true)} className="dropdown-item" style={{width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '1rem'}}>Rate Recent Delivery</button>
+                  <button onClick={() => setShowAccountModal(true)} className="dropdown-item dropdown-btn-style">My Account</button>
+                  <button onClick={() => setShowOrdersModal(true)} className="dropdown-item dropdown-btn-style">Order History</button>
+                  <button onClick={() => setShowFeedback(true)} className="dropdown-item dropdown-btn-style">Rate Recent Delivery</button>
                   <button onClick={logout} className="dropdown-item logout-btn">Sign Out</button>
                 </div>
               </div>
@@ -77,6 +81,8 @@ const Navbar = () => {
       </div>
       
       {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+      {showAccountModal && <AccountModal onClose={() => setShowAccountModal(false)} />}
+      {showOrdersModal && <OrdersModal onClose={() => setShowOrdersModal(false)} />}
     </nav>
   );
 };
