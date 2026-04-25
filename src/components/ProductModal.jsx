@@ -11,14 +11,8 @@ const ProductModal = ({ product, onClose }) => {
   const { user } = useContext(AuthContext);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [localRating, setLocalRating] = useState(0);
-  const [localReviews, setLocalReviews] = useState(0);
-
   useEffect(() => {
-    if (product) {
-      setLocalRating(product.rating || 0);
-      setLocalReviews(product.numReviews || 0);
-    }
+    // Component setup if needed
   }, [product]);
 
   if (!product) return null;
@@ -43,25 +37,7 @@ const ProductModal = ({ product, onClose }) => {
     }
   };
 
-  const handleRate = async (stars) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/products/${product.id || product._id}/rate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating: stars })
-      });
-      if (res.ok) {
-         const updated = await res.json();
-         setLocalRating(updated.rating);
-         setLocalReviews(updated.numReviews);
-         // Broadcast to grid
-         const channel = new BroadcastChannel('inventory_sync');
-         channel.postMessage('update');
-      }
-    } catch(e) {
-      console.error(e);
-    }
-  };
+
 
   return (
     <div className="product-modal-overlay" onClick={handleOverlayClick}>
@@ -78,14 +54,7 @@ const ProductModal = ({ product, onClose }) => {
                 <h2 className="modal-title">{product.name}</h2>
                 
                 <div className="modal-rating">
-                    <span className="stars" style={{cursor: 'pointer', fontSize: '1.2rem', color: '#fbbf24', marginRight: '0.5rem'}} title="Click to rate this product">
-                      {[1,2,3,4,5].map(star => (
-                        <span key={star} onClick={() => handleRate(star)} style={{color: star <= Math.round(localRating) ? '#fbbf24' : '#cbd5e1', transition: 'color 0.2s'}}>
-                          {star <= Math.round(localRating) ? '★' : '☆'}
-                        </span>
-                      ))}
-                    </span>
-                    <span className="rating-count">{localReviews} Review{localReviews !== 1 && 's'}</span> | <span className="sku">SKU: CCS-{(product.id || product._id || '').substring(18) || '0000'}</span>
+                    <span className="sku">SKU: CCS-{(product.id || product._id || '').substring(18) || '0000'}</span>
                 </div>
 
                 <div className="modal-price-block">

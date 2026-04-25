@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import CatalogModal from './CatalogModal';
 import './Hero.css';
 
 const Hero = () => {
+  const [showCatalog, setShowCatalog] = useState(false);
+
   return (
     <section className="hero">
       <div className="container hero-container">
@@ -14,7 +17,7 @@ const Hero = () => {
             CleanCare delivers unparalleled commercial-grade cleaning supplies direct to your door. Whether you're stocking a massive enterprise facility or securing high-end products for your home, we have you covered.
           </p>
           <div className="hero-cta">
-            <a href="/#products" className="btn btn-primary btn-large">Shop Full Catalog</a>
+            <button onClick={() => setShowCatalog(true)} className="btn btn-primary btn-large">Shop Full Catalog</button>
           </div>
 
           <div className="hero-trust">
@@ -28,6 +31,8 @@ const Hero = () => {
            <img src="/hero-banner.png" alt="Premium Cleaning Supplies" className="hero-image" />
         </div>
       </div>
+
+      {showCatalog && <CatalogModal onClose={() => setShowCatalog(false)} />}
     </section>
   );
 };

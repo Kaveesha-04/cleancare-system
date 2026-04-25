@@ -14,6 +14,7 @@ const User = require('./models/User');
 const Product = require('./models/Product');
 const Order = require('./models/Order');
 const Department = require('./models/Department');
+const Feedback = require('./models/Feedback');
 
 const app = express();
 app.use(helmet());
@@ -253,6 +254,24 @@ app.post('/api/products/:id/rate', async (req, res) => {
     res.json({ ...product.toObject(), id: product._id });
   } catch (error) {
     res.status(500).json({ error: 'Server error saving rating' });
+  }
+});
+
+// -- POST-DELIVERY FEEDBACK ENDPOINT --
+app.post('/api/feedback', async (req, res) => {
+  try {
+    const { userId, rating, deliverySpeed, quality, comments } = req.body;
+    if (!rating || !deliverySpeed || !quality) {
+      return res.status(400).json({ error: 'Please provide all required star ratings.' });
+    }
+    
+    const f = new Feedback({ userId, rating, deliverySpeed, quality, comments });
+    await f.save();
+    
+    res.status(201).json({ message: 'Feedback submitted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error saving feedback' });
   }
 });
 
