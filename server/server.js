@@ -425,6 +425,7 @@ app.post('/api/checkout', [
     }
 
     // Determine active prices and total cost
+    const mappedItems = [];
     for (let item of items) {
       let productQuery;
       if (mongoose.Types.ObjectId.isValid(item.id)) productQuery = { _id: item.id };
@@ -441,6 +442,13 @@ app.post('/api/checkout', [
       
       const discountedPrice = activeDiscount > 0 ? activePrice * (1 - (activeDiscount / 100)) : activePrice;
       
+      mappedItems.push({
+        id: item.id || product.barcode,
+        productId: product._id,
+        quantity: item.quantity,
+        price: discountedPrice
+      });
+
       total += discountedPrice * item.quantity;
       product.stock -= item.quantity;
       await product.save();
@@ -480,7 +488,7 @@ app.post('/api/checkout', [
       pointsEarned,
       paymentMethod,
       orderType,
-      items: items.map(i => ({ id: i.id, quantity: i.quantity, price: i.price, productId: mongoose.Types.ObjectId.isValid(i.id) ? i.id : null })),
+      items: mappedItems,
       userId: user ? user._id : null
     });
 
@@ -535,6 +543,15 @@ app.get('/api/orders/my-orders', authMiddleware, async (req, res) => {
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch order history' });
+  }
+});
+
+app.get('/api/orders', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const orders = await Order.find({}).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to aggregate global analytics orders' });
   }
 });
 
