@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
 const { body, validationResult } = require('express-validator');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -18,44 +17,15 @@ const Department = require('./models/Department');
 
 const app = express();
 app.use(helmet());
-
-// Secure Cross-Origin Resource Sharing logic
-const allowedOrigins = [
-  'http://localhost:5173', 
-  'http://127.0.0.1:5173',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow if no origin (e.g. mobile apps, curl) OR exact match OR local network IP
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://192.168.') || origin.startsWith('http://10.')) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Temporarily allow all to prevent mobile testing crashes
-    }
-  },
-  credentials: true
-}));
-
+app.use(cors());
 app.use(express.json({ limit: '20kb' }));
 
-// NoSQL Injection Vector Remediation
-app.use(mongoSanitize());
-
-const apiLimiter = rateLimit({
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
   max: 300, 
-  message: 'Too many standard requests from this IP'
+  message: 'Too many requests from this IP'
 });
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 7, 
-  message: 'Too many authentication attempts. Please bridge a 15-minute verification delay before trying again.'
-});
-
-app.use(apiLimiter);
+app.use(limiter);
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cleancare_super_secure_key_2026!';
 
@@ -117,7 +87,7 @@ mongoose.connection.once('open', initDB);
 
 // -- AUTHENTICATION & SECURITY --
 
-app.post('/api/auth/login', authLimiter, async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { identifier, password } = req.body;
     
@@ -144,7 +114,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/auth/register', authLimiter, [
+app.post('/api/auth/register', [
   body('username').notEmpty().withMessage('Username required'),
   body('email').isEmail().withMessage('Valid email required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
