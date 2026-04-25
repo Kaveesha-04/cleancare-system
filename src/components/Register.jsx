@@ -109,7 +109,7 @@ const Register = () => {
             </div>
             
             <div style={{display: 'flex', justifyContent: 'center', marginTop: '1rem', marginBottom: '1.5rem'}}>
-              <GoogleLogin 
+              {/* <GoogleLogin 
                 onSuccess={handleGoogleSuccess} 
                 onError={() => setError('Google Authentication Failed')} 
                 type="standard" 
@@ -117,7 +117,7 @@ const Register = () => {
                 size="large" 
                 text="signup_with" 
                 shape="rectangular" 
-              />
+              /> */}
             </div>
           </>
           ) : (

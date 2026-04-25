@@ -134,15 +134,10 @@ const Login = () => {
             </div>
 
             <div style={{display: 'flex', justifyContent: 'center', marginTop: '1rem'}}>
-              <GoogleLogin 
+              {/* <GoogleLogin 
                 onSuccess={handleGoogleSuccess} 
                 onError={() => setError('Google Login Failed')} 
-                type="standard" 
-                theme="outline" 
-                size="large" 
-                text="signin_with" 
-                shape="rectangular" 
-              />
+              /> */}
             </div>
 
             <div style={{marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem'}}>
