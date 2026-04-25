@@ -1,0 +1,223 @@
+.checkout-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.checkout-modal-content {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.checkout-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-page);
+}
+
+.checkout-modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.checkout-modal-body {
+  padding: 1.5rem;
+}
+
+.checkout-amount-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg-page);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-amount-summary span {
+  color: var(--color-text-muted);
+}
+
+.checkout-amount-summary strong {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.checkout-payment-methods {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pm-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.pm-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-bg-page);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-text-main);
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+}
+
+.stripe-mock-card-input {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.stripe-mock-card-input input {
+  border: none;
+  border-radius: 0;
+}
+
+.stripe-mock-card-input .card-number {
+  flex: 2;
+  border-right: 1px solid var(--color-border);
+}
+
+.stripe-mock-card-input .card-expiry {
+  flex: 1;
+  border-right: 1px solid var(--color-border);
+}
+
+.stripe-mock-card-input .card-cvc {
+  flex: 1;
+}
+
+.invoice-terms {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+.btn-pay-now {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-primary);
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-pay-now:hover:not(:disabled) {
+  background: var(--color-primary-light);
+}
+
+.btn-pay-now.loading {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.secure-badge {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 1rem;
+}
+
+.checkout-success-view {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.success-checkmark {
+  width: 80px;
+  height: 80px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  margin: 0 auto 1.5rem auto;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); }
+  80% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.checkout-success-view h2 {
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.checkout-success-view p {
+  color: var(--color-text-muted);
+}

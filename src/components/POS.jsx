@@ -1,0 +1,194 @@
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import POSTicket from './pos/POSTicket';
+import POSGrid from './pos/POSGrid';
+import POSReceipt from './pos/POSReceipt';
+import { API_BASE_URL } from '../config';
+import './POS.css';
+
+const POS = () => {
+  const [cart, setCart] = useState([]);
+  const [barcodeBuffer, setBarcodeBuffer] = useState('');
+  const [error, setError] = useState('');
+  const [lastOrder, setLastOrder] = useState(null);
+  
+  // New state for Grid
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const { logout } = useContext(AuthContext);
+
+  // Focus ref to keep scanner active
+  const hiddenInputRef = useRef(null);
+
+  const fetchProducts = () => {
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE_URL}/products`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    })
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoadingProducts(false);
+      })
+      .catch(err => {
+        console.error("Failed to load products for POS", err);
+        setLoadingProducts(false);
+      });
+  };
+
+  useEffect(() => {
+    // Keep focus on the hidden input to capture barcode scanner strokes globally
+    const focusScanner = () => {
+      // Don't steal focus if user is typing in a real text input
+      if (document.activeElement && document.activeElement.tagName === 'INPUT' && document.activeElement !== hiddenInputRef.current) {
+        return;
+      }
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.focus();
+      }
+    };
+    
+    focusScanner();
+    window.addEventListener('click', focusScanner);
+
+    fetchProducts();
+
+    return () => window.removeEventListener('click', focusScanner);
+  }, []);
+
+  const handleBarcodeSubmit = async (e) => {
+    e.preventDefault();
+    if (!barcodeBuffer.trim()) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/products/scan/${barcodeBuffer}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Product not found / Unauthorized');
+      
+      const product = await response.json();
+      
+      // Add to cart via scanning
+      handleAddToTicket(product);
+      setError('');
+    } catch (err) {
+      setError(err.message + ` (${barcodeBuffer})`);
+    }
+    setBarcodeBuffer(''); // Reset buffer instantly
+  };
+
+  const handleAddToTicket = (product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item => item.id === product.id ? {...item, quantity: item.quantity + 1} : item);
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  };
+
+  const updateQuantity = (id, amount) => {
+    setCart(prev => prev.map(item => {
+      if (item.id === id) {
+        const newQ = item.quantity + amount;
+        return newQ > 0 ? { ...item, quantity: newQ } : item;
+      }
+      return item;
+    }));
+  };
+
+  const removeItem = (id) => {
+    setCart(prev => prev.filter(item => item.id !== id));
+  };
+  
+  const clearTicket = () => setCart([]);
+
+  const handleCheckout = async (paymentMethod) => {
+    if (cart.length === 0) return;
+
+    const payload = {
+      orderType: 'pos',
+      paymentMethod,
+      items: cart.map(i => ({ id: i.id, quantity: i.quantity }))
+    };
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE_URL}/checkout`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Checkout failed');
+      }
+      
+      const data = await res.json();
+      
+      // Save last order for receipt printing
+      setLastOrder({
+        id: data.orderId,
+        total: data.total,
+        items: [...cart],
+        method: paymentMethod,
+        date: new Date().toLocaleString()
+      });
+
+      setCart([]);
+      
+      // Global Inventory Real-Time Sync reload
+      fetchProducts();
+      
+      // Trigger native browser print for the receipt panel
+      setTimeout(() => window.print(), 500);
+
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="pos-layout-loyverse">
+      {/* Hidden input for Barcode Scanner (Scanner acts as keyboard) */}
+      <form onSubmit={handleBarcodeSubmit} className="scanner-form" style={{position: 'absolute', opacity: 0}}>
+        <input 
+          ref={hiddenInputRef}
+          type="text" 
+          value={barcodeBuffer}
+          onChange={(e) => setBarcodeBuffer(e.target.value)}
+          className="scanner-hidden-input"
+          autoFocus
+        />
+      </form>
+
+      {/* LEFT PANEL: Interactive Product Grid */}
+      <POSGrid 
+        products={products}
+        loading={loadingProducts}
+        onProductClick={handleAddToTicket}
+      />
+
+      {/* RIGHT PANEL: The Ticket / Cart */}
+      <POSTicket 
+        cart={cart}
+        updateQuantity={updateQuantity}
+        removeItem={removeItem}
+        clearTicket={clearTicket}
+        handleCheckout={handleCheckout}
+        error={error}
+      />
+
+      {/* RECEIPT PRINT LAYOUT - Only visible during window.print() */}
+      <POSReceipt lastOrder={lastOrder} />
+    </div>
+  );
+};
+
+export default POS;

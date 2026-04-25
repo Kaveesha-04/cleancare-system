@@ -1,0 +1,188 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "barcode": "012345678905",
+      "name": "Industrial Grade Microfiber Cloths (12-Pack)",
+      "price": 7500,
+      "discount": 0,
+      "category": "Tools & Equipment",
+      "description": "Ultra-absorbent, lint-free microfiber cloths perfect for commercial spaces.",
+      "stock": 146,
+      "image": "https://images.unsplash.com/photo-1584820927498-cafe2c1eb66f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 2,
+      "barcode": "098765432109",
+      "name": "Eco-Safe Multi-Surface Cleaner",
+      "price": 10350,
+      "discount": 0,
+      "category": "Chemicals & Detergents",
+      "description": "Powerful, plant-based cleaner that cuts through tough grease.",
+      "stock": 316,
+      "image": "https://images.unsplash.com/photo-1585421514738-01798e348b17?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 3,
+      "barcode": "112233445566",
+      "name": "Commercial HEPA Backpack Vacuum",
+      "price": 89700,
+      "discount": 0,
+      "category": "Machinery",
+      "description": "Cordless backpack vacuum with HEPA filtration.",
+      "stock": 14,
+      "image": "https://images.unsplash.com/photo-1558317374-067fb5f300cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "store_admin",
+      "email": "admin@cleancaresupply.com",
+      "passwordHash": "$2b$10$TWABMHWgMIidg4VugOIDguOy3QZzF9pJUnJPUUaThOsDnMQ.TFCR2",
+      "role": "admin",
+      "loyaltyPoints": 10350,
+      "name": "Store Manager"
+    },
+    {
+      "id": 2,
+      "username": "val_customer",
+      "email": "customer@test.com",
+      "passwordHash": "$2b$10$TWABMHWgMIidg4VugOIDguH69EfuM33fAJwh.UEX5dKgy3evMULfO",
+      "role": "customer",
+      "loyaltyPoints": 500,
+      "name": "Valued Customer"
+    }
+  ],
+  "orders": [
+    {
+      "id": 1777021053247,
+      "subtotal": 7500,
+      "discountApplied": 0,
+      "finalTotal": 7500,
+      "pointsEarned": 0,
+      "paymentMethod": "Stripe/Online",
+      "orderType": "online",
+      "items": [
+        {
+          "id": 1,
+          "quantity": 1
+        }
+      ],
+      "userId": null,
+      "createdAt": "2026-04-24T08:57:33.248Z"
+    },
+    {
+      "id": 1777021387637,
+      "subtotal": 7500,
+      "discountApplied": 0,
+      "finalTotal": 7500,
+      "pointsEarned": 0,
+      "paymentMethod": "Cash",
+      "orderType": "pos",
+      "items": [
+        {
+          "id": 1,
+          "quantity": 1
+        }
+      ],
+      "userId": null,
+      "createdAt": "2026-04-24T09:03:07.637Z"
+    },
+    {
+      "id": 1777021402437,
+      "subtotal": 7500,
+      "discountApplied": 0,
+      "finalTotal": 7500,
+      "pointsEarned": 0,
+      "paymentMethod": "Card",
+      "orderType": "pos",
+      "items": [
+        {
+          "id": 1,
+          "quantity": 1
+        }
+      ],
+      "userId": null,
+      "createdAt": "2026-04-24T09:03:22.437Z"
+    },
+    {
+      "id": 1777021869447,
+      "subtotal": 10350,
+      "discountApplied": 0,
+      "finalTotal": 10350,
+      "pointsEarned": 0,
+      "paymentMethod": "Cash",
+      "orderType": "pos",
+      "items": [
+        {
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "userId": null,
+      "createdAt": "2026-04-24T09:11:09.447Z"
+    },
+    {
+      "id": 1777031421215,
+      "subtotal": 100050,
+      "discountApplied": 0,
+      "finalTotal": 100050,
+      "pointsEarned": 0,
+      "paymentMethod": "QR",
+      "orderType": "pos",
+      "items": [
+        {
+          "id": 3,
+          "quantity": 1
+        },
+        {
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "userId": null,
+      "createdAt": "2026-04-24T11:50:21.215Z"
+    },
+    {
+      "id": 1777033256399,
+      "subtotal": 7500,
+      "discountApplied": 0,
+      "finalTotal": 7500,
+      "pointsEarned": 0,
+      "paymentMethod": "QR",
+      "orderType": "pos",
+      "items": [
+        {
+          "id": 1,
+          "quantity": 1
+        }
+      ],
+      "userId": null,
+      "createdAt": "2026-04-24T12:20:56.399Z"
+    }
+  ],
+  "departments": [
+    {
+      "name": "Chemicals",
+      "sections": [
+        "Floor Cleaners",
+        "Sanitizers"
+      ]
+    },
+    {
+      "name": "Equipment",
+      "sections": [
+        "Vacuums",
+        "Mops"
+      ]
+    },
+    {
+      "name": "Paper Products",
+      "sections": [
+        "Toilet Tissue",
+        "Towels"
+      ]
+    }
+  ]
+}

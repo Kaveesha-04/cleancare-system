@@ -1,0 +1,92 @@
+.admin-layout-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  width: 280px;
+  background-color: #0f172a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.admin-sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #1e293b;
+  text-align: center;
+}
+
+.admin-sidebar-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #38bdf8;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 1px;
+}
+
+.admin-sidebar-header p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.admin-nav {
+  flex-grow: 1;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-nav-link {
+  padding: 1rem 1.5rem;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.admin-nav-link:hover, .admin-nav-link.active {
+  background-color: #1e293b;
+  color: white;
+  border-left-color: #38bdf8;
+}
+
+.admin-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #1e293b;
+}
+
+.admin-exit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.admin-exit-btn:hover {
+  background-color: #f87171;
+  color: white;
+}
+
+.admin-content-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  position: relative;
+}
