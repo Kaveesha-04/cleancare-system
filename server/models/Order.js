@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema({
-  id: { type: Number, required: true }, // Keeping old ID mapping for products if needed, better yet maybe reference
+  id: { type: String, required: true }, // Keeping old ID mapping for products if needed
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
   quantity: { type: Number, required: true },
   price: { type: Number, required: true }

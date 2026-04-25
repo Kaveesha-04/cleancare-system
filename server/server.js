@@ -225,7 +225,7 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/departments', async (req, res) => {
   try {
     const departments = await Department.find({});
-    res.json(departments);
+    res.json(departments.map(d => ({...d.toObject(), id: d._id})));
   } catch (error) {
     res.status(500).json({ error: 'Failed' });
   }
@@ -278,7 +278,7 @@ app.post('/api/departments', authMiddleware, requireAdmin, async (req, res) => {
 
     await dept.save();
     const departments = await Department.find({});
-    res.json(departments);
+    res.json(departments.map(d => ({...d.toObject(), id: d._id})));
   } catch (error) {
     res.status(500).json({ error: 'Failed' });
   }
@@ -287,7 +287,7 @@ app.post('/api/departments', authMiddleware, requireAdmin, async (req, res) => {
 app.get('/api/orders', authMiddleware, requireAdmin, async (req, res) => {
   try {
     const orders = await Order.find({}).sort({ createdAt: -1 });
-    res.json(orders);
+    res.json(orders.map(o => ({...o.toObject(), id: o._id})));
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
