@@ -10,8 +10,8 @@ const POSReceipt = ({ lastOrder }) => {
     <div className="receipt-print-container" style={{fontFamily: "'Courier New', Courier, monospace", fontSize: '12px', background: 'white', color: 'black', padding: '0', width: '100%', maxWidth: '80mm', margin: '0 auto'}}>
       <div className="receipt-header" style={{textAlign: 'center', marginBottom: '10px'}}>
         <h2 style={{margin: '0 0 5px 0', fontSize: '18px', fontWeight: 'bold'}}>CLEANCARE SUPPLY</h2>
-        <p style={{margin: '0', fontSize: '12px'}}>123 Industrial Way<br/>Wholesale Park, SL</p>
-        <p style={{margin: '5px 0 0 0', fontSize: '12px'}}>Tel: +94 77 123 4567</p>
+        <p style={{margin: '0', fontSize: '12px'}}>Avissawella Road,<br/>Kaluaggala, Hanwella</p>
+        <p style={{margin: '5px 0 0 0', fontSize: '12px'}}>Tel: +94751854938</p>
       </div>
       
       <div style={{borderBottom: '1px dashed black', margin: '10px 0'}}></div>

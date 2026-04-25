@@ -408,27 +408,22 @@
 }
 
 @media print {
-  .pos-grid-container, .pos-ticket-container, .theme-toggle {
-    display: none !important;
+  body * {
+    visibility: hidden;
   }
-
-  body, html {
-    background-color: white !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 80mm !important;
+  
+  .receipt-print-container, .receipt-print-container * {
+    visibility: visible;
   }
-
-  @page {
-    margin: 0;
-    size: 80mm auto;
-  }
-
+  
   .receipt-print-container {
     display: block !important;
-    width: 76mm !important;
-    margin: 0 auto;
-    padding: 2mm 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
     font-family: 'Courier New', Courier, monospace !important;
     font-size: 13px !important;
     color: black !important;
