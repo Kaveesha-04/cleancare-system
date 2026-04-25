@@ -15,7 +15,7 @@ const Footer = () => {
         </div>
         
         <div className="footer-links">
-          <h4>Categories</h4>
+          <h4>Departments</h4>
           <ul>
             <li><a href="#products">Chemicals & Detergents</a></li>
             <li><a href="#products">Tools & Equipment</a></li>
@@ -36,9 +36,9 @@ const Footer = () => {
 
         <div className="footer-contact">
           <h4>Support & Sales</h4>
-          <p>Email: sales@cleancaresupply.com</p>
-          <p>Phone: +1 (800) 555-CARE</p>
-          <a href="mailto:sales@cleancaresupply.com" className="btn btn-primary mt-1">Contact Support</a>
+          <p>Email: cleancaresupply@gmail.com</p>
+          <p>Phone: +94751854938</p>
+          <a href="mailto:cleancaresupply@gmail.com" className="btn btn-primary mt-1">Contact Support</a>
         </div>
       </div>
       <div className="footer-bottom container">

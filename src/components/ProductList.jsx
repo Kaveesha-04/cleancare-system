@@ -53,19 +53,15 @@ const ProductList = () => {
 
   const filteredProducts = products.filter(p => {
     if (!searchQuery) return true;
-    const term = searchQuery.toLowerCase();
-    const deptMatch = p.department ? p.department.toLowerCase().includes(term) : false;
-    const sectionMatch = p.section ? p.section.toLowerCase().includes(term) : false;
-    const catMatch = p.category ? p.category.toLowerCase().includes(term) : false; // fallback just in case old db records exist
-    return p.name.toLowerCase().includes(term) || deptMatch || sectionMatch || catMatch;
+    const searchWords = searchQuery.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+    
+    return searchWords.every(term => {
+      const deptMatch = p.department ? p.department.toLowerCase().includes(term) : false;
+      const sectionMatch = p.section ? p.section.toLowerCase().includes(term) : false;
+      const catMatch = p.category ? p.category.toLowerCase().includes(term) : false;
+      return p.name.toLowerCase().includes(term) || deptMatch || sectionMatch || catMatch;
+    });
   });
-
-  // Automatically open product modal if exactly 1 structural match is found
-  useEffect(() => {
-    if (searchQuery && filteredProducts.length === 1 && !loading) {
-      setSelectedProduct(filteredProducts[0]);
-    }
-  }, [searchQuery, filteredProducts.length, loading]);
 
   const departments = [...new Set(filteredProducts.map(p => p.department || p.category || 'General'))];
 
