@@ -109,6 +109,7 @@ app.post('/api/auth/login', async (req, res) => {
     delete safeUser.passwordHash;
     res.json({ token, user: safeUser });
   } catch (error) {
+    console.error("CRITICAL LOGIN SERVER ERROR:", error);
     res.status(500).json({ error: 'Server error' });
   }
 });
