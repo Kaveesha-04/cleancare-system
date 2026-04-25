@@ -47,14 +47,21 @@ const CheckoutModal = ({ amount, onConfirm, onCancel }) => {
                   onClick={() => setPaymentType('card')}
                   type="button"
                 >
-                  💳 Credit Card
+                  💳 Stripe (Card)
+                </button>
+                <button 
+                  className={`pm-btn ${paymentType === 'paypal' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('paypal')}
+                  type="button"
+                >
+                  🅿️ PayPal
                 </button>
                 <button 
                   className={`pm-btn ${paymentType === 'invoice' ? 'active' : ''}`}
                   onClick={() => setPaymentType('invoice')}
                   type="button"
                 >
-                  🏢 Net-30 Invoice
+                  🏢 Local Invoice
                 </button>
               </div>
 
@@ -78,10 +85,15 @@ const CheckoutModal = ({ amount, onConfirm, onCancel }) => {
                       <input type="text" required placeholder="Full Name" />
                     </div>
                   </div>
+                ) : paymentType === 'paypal' ? (
+                  <div className="paypal-mock-container" style={{textAlign: 'center', padding: '2rem 1rem'}}>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style={{height: '30px', marginBottom: '1rem'}} />
+                    <p style={{color: 'var(--color-text-muted)', marginBottom: '1rem'}}>You will be redirected to PayPal to complete your purchase securely.</p>
+                  </div>
                 ) : (
                   <div className="invoice-mock-container">
                     <div className="form-group">
-                      <label>Business Name</label>
+                      <label>Registered Account Name</label>
                       <input type="text" required placeholder="E.g. CleanCare Industries LLC" />
                     </div>
                     <div className="form-group">

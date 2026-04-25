@@ -8,16 +8,23 @@ const POSTicket = ({ cart, updateQuantity, removeItem, clearTicket, handleChecko
 
   const { user } = useContext(AuthContext); // Access user to check if retail/wholesale rules apply
 
+  const [overrideTier, setOverrideTier] = useState('retail');
+  const [manualDiscountPercent, setManualDiscountPercent] = useState(0);
+
   const totalRawLKR = cart.reduce((acc, item) => {
-    const isWholesale = user?.role === 'wholesale';
+    const isWholesale = overrideTier === 'wholesale' || user?.role === 'wholesale';
     const activePrice = isWholesale && item.wholesalePrice ? item.wholesalePrice : item.price;
     const activeDiscount = isWholesale ? (item.wholesaleDiscount || 0) : (item.retailDiscount || item.discount || 0);
     const discountedPrice = activeDiscount > 0 ? activePrice * (1 - (activeDiscount / 100)) : activePrice;
     return acc + (discountedPrice * item.quantity);
   }, 0);
+  
+  const finalTotalLKR = manualDiscountPercent > 0 
+    ? totalRawLKR * (1 - (manualDiscountPercent / 100)) 
+    : totalRawLKR;
 
   const onCheckoutClick = (method) => {
-    handleCheckout(method);
+    handleCheckout(method, overrideTier, manualDiscountPercent);
     setShowPaymentModal(false);
   };
 
@@ -36,7 +43,7 @@ const POSTicket = ({ cart, updateQuantity, removeItem, clearTicket, handleChecko
       {/* Cart Items List */}
       <div className="pos-ticket-items">
         {cart.map(item => {
-          const isWholesale = user?.role === 'wholesale';
+          const isWholesale = overrideTier === 'wholesale' || user?.role === 'wholesale';
           const activePrice = isWholesale && item.wholesalePrice ? item.wholesalePrice : item.price;
           const activeDiscount = isWholesale ? (item.wholesaleDiscount || 0) : (item.retailDiscount || item.discount || 0);
           
@@ -70,10 +77,24 @@ const POSTicket = ({ cart, updateQuantity, removeItem, clearTicket, handleChecko
       <div className="pos-ticket-footer">
         {error && <div className="pos-ticket-error">{error}</div>}
         
+        <div style={{display: 'flex', gap: '0.5rem', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px dashed var(--color-border)'}}>
+           <div style={{flex: 1}}>
+              <label style={{fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--color-text-muted)'}}>Walk-in Customer Tier</label>
+              <select value={overrideTier} onChange={e => setOverrideTier(e.target.value)} style={{width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)'}}>
+                 <option value="retail">Retail Account</option>
+                 <option value="wholesale">Wholesale Partner</option>
+              </select>
+           </div>
+           <div style={{flex: 1}}>
+              <label style={{fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--color-text-muted)'}}>Manual Discount (%)</label>
+              <input type="number" min="0" max="100" value={manualDiscountPercent} onChange={e => setManualDiscountPercent(e.target.value)} style={{width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--color-border)'}} placeholder="0%" />
+           </div>
+        </div>
+
         <div className="pos-ticket-summary">
             <div className="summary-row">
                 <span>Total</span>
-                <span className="summary-total">{formatPrice(totalRawLKR)}</span>
+                <span className="summary-total">{formatPrice(finalTotalLKR)}</span>
             </div>
         </div>
 
@@ -83,7 +104,7 @@ const POSTicket = ({ cart, updateQuantity, removeItem, clearTicket, handleChecko
             disabled={cart.length === 0}
             onClick={() => setShowPaymentModal(!showPaymentModal)}
         >
-            CHARGE {formatPrice(totalRawLKR)}
+            CHARGE {formatPrice(finalTotalLKR)}
         </button>
 
         {/* Pseudo Modal for Payment Methods (Loyverse style slide-up) */}

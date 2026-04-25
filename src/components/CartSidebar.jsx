@@ -53,13 +53,15 @@ const CartSidebar = () => {
       });
       
       if (!res.ok) {
-        throw new Error('Failed to checkout on server');
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to checkout on server');
       }
       
       if (user) await refreshUser(); // Update points globally
       
-      // Notify ProductList to fetch fresh stocks immediately
-      window.dispatchEvent(new Event('inventory-updated'));
+      // Notify ProductList and POS across ALL browser tabs to fetch fresh stocks instantly
+      const channel = new BroadcastChannel('inventory_sync');
+      channel.postMessage('update');
       
       setApplyPoints(false);
       setShowCheckout(false);

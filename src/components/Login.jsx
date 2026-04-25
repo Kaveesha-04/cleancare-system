@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
 import './Login.css';
 
 const Login = () => {
@@ -63,7 +62,7 @@ const Login = () => {
       <div className="login-card" style={{background: 'var(--color-bg-card)', padding: '3rem', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)', maxWidth: '450px', width: '100%', border: '1px solid var(--color-border)'}}>
         <div style={{textAlign: 'center', marginBottom: '2rem'}}>
             <h2 style={{color: 'var(--color-primary)', fontSize: '2rem', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif"}}>Sign-In</h2>
-            <p style={{color: 'var(--color-text-muted)'}}>Access your CleanCare Wholesale Account.</p>
+            <p style={{color: 'var(--color-text-muted)'}}>Access your CleanCare Account.</p>
         </div>
         
         {error && <div className="login-error" style={{color: 'white', background: '#ef4444', padding: '0.75rem', borderRadius: '4px', textAlign: 'center', marginBottom: '1rem'}}>{error}</div>}
@@ -135,15 +134,19 @@ const Login = () => {
             </div>
 
             <div style={{display: 'flex', justifyContent: 'center', marginTop: '1rem'}}>
-              {/* <GoogleLogin 
-                onSuccess={handleGoogleSuccess} 
-                onError={() => setError('Google Login Failed')} 
-              /> */}
+              <button 
+                type="button" 
+                onClick={() => alert("Social Login integration will be fully activated before the final release.")}
+                style={{width: '100%', padding: '0.75rem', background: 'white', color: '#333', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', cursor: 'pointer', fontWeight: 'bold'}}
+              >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G" style={{width: '20px'}} />
+                Continue with Google
+              </button>
             </div>
 
             <div style={{marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem'}}>
                 <p style={{color: 'var(--color-text-muted)', marginBottom: '0.5rem'}}>New to CleanCare Supply?</p>
-                <button onClick={() => navigate('/register')} style={{width: '100%', padding: '0.75rem', background: 'var(--color-bg-page)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold'}}>Create your business account</button>
+                <button onClick={() => navigate('/register')} style={{width: '100%', padding: '0.75rem', background: 'var(--color-bg-page)', border: '1px solid var(--color-border)', color: 'var(--color-text-main)', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold'}}>Create an account</button>
             </div>
           </>
         )}

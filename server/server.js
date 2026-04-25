@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 const { body, validationResult } = require('express-validator');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -17,15 +18,43 @@ const Department = require('./models/Department');
 
 const app = express();
 app.use(helmet());
-app.use(cors());
+
+// Secure Cross-Origin Resource Sharing logic
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://127.0.0.1:5173',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Blocked by CORS strategy'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json({ limit: '20kb' }));
 
-const limiter = rateLimit({
+// NoSQL Injection Vector Remediation
+app.use(mongoSanitize());
+
+const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
   max: 300, 
-  message: 'Too many requests from this IP'
+  message: 'Too many standard requests from this IP'
 });
-app.use(limiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 7, 
+  message: 'Too many authentication attempts. Please bridge a 15-minute verification delay before trying again.'
+});
+
+app.use(apiLimiter);
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cleancare_super_secure_key_2026!';
 
@@ -87,7 +116,7 @@ mongoose.connection.once('open', initDB);
 
 // -- AUTHENTICATION & SECURITY --
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', authLimiter, async (req, res) => {
   try {
     const { identifier, password } = req.body;
     
@@ -114,7 +143,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.post('/api/auth/register', [
+app.post('/api/auth/register', authLimiter, [
   body('username').notEmpty().withMessage('Username required'),
   body('email').isEmail().withMessage('Valid email required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -353,9 +382,20 @@ app.post('/api/checkout', [
   if (!errors.isEmpty()) return res.status(400).json({ error: errors.array()[0].msg });
 
   try {
-    const { items, paymentMethod, orderType, applyPoints, userId } = req.body;
+    const { items, paymentMethod, orderType, applyPoints, userId, overrideTier, manualDiscountPercent } = req.body;
     let total = 0;
     let user = null;
+    let isAdmin = false;
+
+    // Securely extract admin credentials if present for POS overrides
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const tokenStr = authHeader.split(' ')[1];
+        const decoded = jwt.verify(tokenStr, process.env.JWT_SECRET || 'fallback_secret_123'); // from your config
+        if (decoded.role === 'admin') isAdmin = true;
+      } catch (e) { /* silent fail for public users */ }
+    }
 
     if (userId) {
       if (mongoose.Types.ObjectId.isValid(userId)) {
@@ -374,7 +414,7 @@ app.post('/api/checkout', [
         return res.status(400).json({ error: `Invalid item or stock: ${item.id}` });
       }
       
-      const isWholesale = user?.role === 'wholesale';
+      const isWholesale = (isAdmin && overrideTier === 'wholesale') || (user?.role === 'wholesale');
       const activePrice = isWholesale && product.wholesalePrice ? product.wholesalePrice : product.price;
       const activeDiscount = isWholesale ? (product.wholesaleDiscount || 0) : (product.retailDiscount || 0); 
       
@@ -385,7 +425,14 @@ app.post('/api/checkout', [
       await product.save();
     }
 
-    let discount = 0;
+    // Apply Admin Manual POS Discount
+    let globalAdminDiscount = 0;
+    if (isAdmin && manualDiscountPercent > 0 && manualDiscountPercent <= 100) {
+      globalAdminDiscount = total * (manualDiscountPercent / 100);
+      total -= globalAdminDiscount;
+    }
+
+    let discount = globalAdminDiscount;
     let pointsEarned = 0;
 
     if (user) {

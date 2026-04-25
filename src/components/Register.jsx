@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
 import './Login.css'; // Reusing login styles for consistency
 
 const Register = () => {
@@ -73,7 +72,7 @@ const Register = () => {
             </div>
 
             <div className="form-group" style={{marginBottom: '1rem'}}>
-              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--color-text-main)'}}>Full Name / Business Name</label>
+              <label style={{display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--color-text-main)'}}>Full Name</label>
               <input 
                 type="text" 
                 required
@@ -110,15 +109,14 @@ const Register = () => {
             </div>
             
             <div style={{display: 'flex', justifyContent: 'center', marginTop: '1rem', marginBottom: '1.5rem'}}>
-              {/* <GoogleLogin 
-                onSuccess={handleGoogleSuccess} 
-                onError={() => setError('Google Authentication Failed')} 
-                type="standard" 
-                theme="outline" 
-                size="large" 
-                text="signup_with" 
-                shape="rectangular" 
-              /> */}
+              <button 
+                type="button" 
+                onClick={() => alert("Social Login integration will be fully activated before the final release.")}
+                style={{width: '100%', padding: '0.75rem', background: 'white', color: '#333', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', cursor: 'pointer', fontWeight: 'bold'}}
+              >
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="G" style={{width: '20px'}} />
+                Sign up with Google
+              </button>
             </div>
           </>
           ) : (

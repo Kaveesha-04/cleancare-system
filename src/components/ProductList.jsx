@@ -37,13 +37,16 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
-    
-    // Listen for real-time inventory adjustments from checkout
-    const handleInventoryUpdate = () => {
-      fetchProducts();
+    // Listen for real-time inventory adjustments across ALL tabs
+    const channel = new BroadcastChannel('inventory_sync');
+    channel.onmessage = (event) => {
+      if (event.data === 'update') {
+        fetchProducts();
+      }
     };
-    window.addEventListener('inventory-updated', handleInventoryUpdate);
-    return () => window.removeEventListener('inventory-updated', handleInventoryUpdate);
+    return () => {
+      channel.close();
+    };
   }, []);
 
   if (loading) return <div className="section-padding text-center">Loading Products...</div>;
@@ -102,13 +105,27 @@ const ProductList = () => {
                     
                     <div className="product-bottom">
                       <div className="product-price">
-                        {user?.role === 'wholesale' && (
-                          <span style={{fontSize: '0.7rem', color: '#16a34a', display: 'block', marginBottom: '0.2rem'}}>Wholesale Active</span>
+                        {!user && product.wholesalePrice ? (
+                          <div style={{display: 'flex', flexDirection: 'column', gap: '0.2rem'}}>
+                            <div style={{fontSize: '0.85rem', color: 'var(--color-text-muted)', textDecoration: 'line-through'}}>
+                              Retail: {formatPrice(product.price, product.retailDiscount)}
+                            </div>
+                            <div style={{color: '#16a34a', fontWeight: 'bold', fontSize: '1.2rem'}}>
+                              {formatPrice(product.wholesalePrice, product.wholesaleDiscount)} <span style={{fontSize: '0.7rem'}}>Wholesale</span>
+                            </div>
+                            <div style={{fontSize: '0.7rem', color: '#ef4444', fontWeight: 'bold'}}>Login to unlock bulk rate</div>
+                          </div>
+                        ) : (
+                          <>
+                            {user?.role === 'wholesale' && (
+                              <span style={{fontSize: '0.7rem', color: '#16a34a', display: 'block', marginBottom: '0.2rem'}}>Wholesale Active</span>
+                            )}
+                            {activeDiscount > 0 && (
+                              <span className="price-original">{formatPrice(activePrice)}</span>
+                            )}
+                            {formatPrice(activePrice, activeDiscount)}
+                          </>
                         )}
-                        {activeDiscount > 0 && (
-                          <span className="price-original">{formatPrice(activePrice)}</span>
-                        )}
-                        {formatPrice(activePrice, activeDiscount)}
                       </div>
                       <button 
                         className="btn btn-outline"

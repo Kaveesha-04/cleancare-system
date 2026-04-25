@@ -1,25 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CurrencyContext } from '../../context/CurrencyContext';
+import { API_BASE_URL } from '../../config';
 
-const POSGrid = ({ products, loading, onProductClick }) => {
+const POSGrid = ({ products, loading, onProductClick, onScanClick }) => {
   const { formatPrice } = React.useContext(CurrencyContext);
-  const [activeCategory, setActiveCategory] = useState('All items');
+  const [activeDepartment, setActiveDepartment] = useState('All items');
+  const [activeSection, setActiveSection] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dbDepartments, setDbDepartments] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/departments`)
+      .then(res => res.json())
+      .then(data => setDbDepartments(data))
+      .catch(err => console.error("Failed to fetch departments for POS", err));
+  }, []);
 
   if (loading) {
     return <div className="pos-grid-loading">Loading items...</div>;
   }
 
-  // Get unique departments for pills
-  const departments = ['All items', ...new Set(products.map(p => p.department || p.category || 'General'))];
-
-  // Filter products based on search and department
+  // Filter products based on exact department and section
   const filteredProducts = products.filter(product => {
     const prodDept = product.department || product.category || 'General';
-    const matchesDepartment = activeCategory === 'All items' || prodDept === activeCategory;
+    const prodSection = product.section || 'General';
+    
+    const matchesDepartment = activeDepartment === 'All items' || prodDept === activeDepartment;
+    const matchesSection = activeSection === 'All' || prodSection === activeSection;
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesDepartment && matchesSearch;
+    
+    return matchesDepartment && matchesSection && matchesSearch;
   });
+
+  const handleDepartmentClick = (deptName) => {
+    setActiveDepartment(deptName);
+    setActiveSection('All'); // Reset section when changing top level
+  };
+
+  const currentDeptObj = dbDepartments.find(d => d.name === activeDepartment);
 
   // Helper to generate a background color based on name string for missing images
   const getColorFromName = (name) => {
@@ -34,27 +52,63 @@ const POSGrid = ({ products, loading, onProductClick }) => {
   return (
     <div className="pos-grid-container">
       {/* Search and Categories Toolbar */}
-      <div className="pos-toolbar">
-        <div className="pos-search-wrapper">
-          <input 
-            type="text" 
-            placeholder="Search items..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pos-search-input"
-          />
-        </div>
-        <div className="pos-categories-scroll">
-          {departments.map(dept => (
+      <div className="pos-toolbar" style={{flexDirection: 'column', paddingBottom: currentDeptObj?.sections?.length > 0 ? '0' : '0.5rem'}}>
+        <div style={{display: 'flex', width: '100%', gap: '1rem', alignItems: 'center'}}>
+          <div className="pos-search-wrapper" style={{marginBottom: 0, flexShrink: 0}}>
+             <button onClick={onScanClick} style={{background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '0.75rem 1rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', justifyContent: 'center'}}>
+               📷 Camera Scan
+             </button>
+          </div>
+          <div className="pos-search-wrapper" style={{marginBottom: 0, flex: 1}}>
+            <input 
+              type="text" 
+              placeholder="Search items..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pos-search-input"
+            />
+          </div>
+          <div className="pos-categories-scroll">
             <button 
-              key={dept} 
-              className={`pos-category-pill ${activeCategory === dept ? 'active' : ''}`}
-              onClick={() => setActiveCategory(dept)}
+                className={`pos-category-pill ${activeDepartment === 'All items' ? 'active' : ''}`}
+                onClick={() => handleDepartmentClick('All items')}
             >
-              {dept}
+                All items
             </button>
-          ))}
+            {dbDepartments.map(dept => (
+              <button 
+                key={dept.id || dept.name} 
+                className={`pos-category-pill ${activeDepartment === dept.name ? 'active' : ''}`}
+                onClick={() => handleDepartmentClick(dept.name)}
+              >
+                {dept.name}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Dynamic Secondary Row for Sections */}
+        {currentDeptObj && currentDeptObj.sections && currentDeptObj.sections.length > 0 && (
+          <div className="pos-categories-scroll" style={{marginTop: '0.5rem', paddingBottom: '0.5rem', borderTop: '1px dashed var(--color-border)', paddingTop: '0.5rem'}}>
+            <button 
+                className={`pos-category-pill ${activeSection === 'All' ? 'active' : ''}`}
+                onClick={() => setActiveSection('All')}
+                style={{fontSize: '0.8rem', padding: '0.3rem 0.8rem'}}
+            >
+                All {activeDepartment}
+            </button>
+            {currentDeptObj.sections.map(section => (
+               <button 
+                  key={section} 
+                  className={`pos-category-pill ${activeSection === section ? 'active' : ''}`}
+                  onClick={() => setActiveSection(section)}
+                  style={{fontSize: '0.8rem', padding: '0.3rem 0.8rem'}}
+                >
+                  {section}
+                </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Grid of Items */}
@@ -66,11 +120,11 @@ const POSGrid = ({ products, loading, onProductClick }) => {
 
             return (
               <div 
-                key={product.id} 
+                key={product.id || product._id || product.barcode || product.name} 
                 className="pos-product-square"
                 onClick={() => onProductClick(product)}
               >
-                {product.image ? (
+                {product.image && !product.image.includes('source.unsplash.com') ? (
                   <div className="pos-product-img-wrapper">
                      <img src={product.image} alt={product.name} />
                   </div>
@@ -90,7 +144,7 @@ const POSGrid = ({ products, loading, onProductClick }) => {
         })}
         {filteredProducts.length === 0 && (
             <div className="pos-no-items">
-                No items found.
+                No items found in this section.
             </div>
         )}
       </div>
